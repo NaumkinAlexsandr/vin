@@ -2,49 +2,48 @@ import React from "react";
 import $ from "jquery";
 
 export function BtnVariablesList() {
-  function handleInput() {
-    let vin = document.getElementById("vinCode").value;
+  async function handleInput() {
+    let vin = document.getElementById("vinCode").value.toUpperCase();
     if (vin.length === 17) {
-      CheckVin(vin);
+      const params = await getVehicleVariableList(vin);
+      console.log(params);
+      showResults(params);
     }
   }
 
-  function CheckVin(vin) {
-    return $.ajax({
-      url: `https://vpic.nhtsa.dot.gov/api/vehicles/getvehiclevariablelist?format=json`,
-      type: "GET",
-      dataType: "json",
-      success: function (result) {
-        console.log(result);
-        result = result.Results.reduce((accumulator, crr) => {
-          if (crr.Value && crr.Value != "Not Applicable") {
-            accumulator[crr.VariableId] = {
-              variable: crr.Variable,
-              value: crr.Value,
+  async function getVehicleVariableList(vin) {
+    try {
+      const url = `https://vpic.nhtsa.dot.gov/api/vehicles/getvehiclevariablelist?format=json&vin=${vin}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.Results && data.Results.length > 0) {
+        return data.Results.reduce((accumulator, current) => {
+          if (current.DataType && current.Description) {
+            accumulator[current.ID] = {
+              DataType: current.DataType,
+              Description: current.Description,
+              GroupName: current.GroupName,
+              Name: current.Name,
             };
           }
-          showResults(result);
+          return accumulator;
         }, {});
-        if (result["143"].value !== "0") {
-          throw result["191"].value;
-        }
-        console.log(result);
-        return result;
-      },
-    });
+      } else {
+        throw new Error("No results found.");
+      }
+    } catch (error) {
+      console.error(error.message);
+      alert(error.message);
+    }
   }
 
   function showResults(param_data) {
     let output_text = "";
 
-    for (let i = 0; i < param_data.Results.length; i++) {
-      let result = param_data.Results[i];
-
-      for (let prop in result) {
-        if (result.hasOwnProperty(prop) && result[prop] !== "") {
-          output_text += prop + ": " + result[prop] + "\n";
-        }
-      }
+    for (let key in param_data) {
+      let result = param_data[key];
+      output_text += `${result.Name}: ${result.Description} \n`;
     }
 
     document.getElementById("results").value = output_text;

@@ -10,20 +10,22 @@ export function BtnSearchCar() {
   }
 
   function getDataByVIN(vin) {
-    $.ajax({
-      url: "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValuesBatch/",
-      type: "POST",
-      data: { format: "json", data: vin },
-      dataType: "json",
-      success: function (result) {
+    fetch("https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValuesBatch/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
+      },
+      body: `format=json&data=${vin}`,
+    })
+      .then((response) => response.json())
+      .then((result) => {
         console.log(result);
         showResults(result);
-      },
-      error: function (xhr, ajaxOptions, thrownError) {
-        console.log(xhr.status);
-        console.log(thrownError);
-      },
-    });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   }
 
   function showResults(param_data) {
@@ -50,3 +52,24 @@ export function BtnSearchCar() {
     </>
   );
 }
+
+/*
+
+ function getDataByVIN(vin) {
+    $.ajax({
+      url: "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValuesBatch/",
+      type: "POST",
+      data: { format: "json", data: vin },
+      dataType: "json",
+      success: function (result) {
+        console.log(result);
+        showResults(result);
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        console.log(xhr.status);
+        console.log(thrownError);
+      },
+    });
+  }
+
+  */

@@ -2,24 +2,26 @@ import React from "react";
 import $ from "jquery";
 
 export function Input({ onClick }) {
-  $(function () {
-    let $ctrl = $("#vinCode");
-    let $msg = $("#validation-message");
+  window.addEventListener("DOMContentLoaded", function () {
+    let ctrl = document.querySelector("#vinCode");
+    let msg = document.querySelector("#validation-message");
 
-    $ctrl.keyup(function () {
-      if (validateVin($ctrl.val())) {
-        $msg.html("VIN is valid!").removeClass("not-valid").addClass("valid");
+    ctrl.addEventListener("keyup", function () {
+      if (validateVin(ctrl.value)) {
+        msg.innerHTML = "VIN is valid!";
+        msg.classList.remove("not-valid");
+        msg.classList.add("valid");
       } else {
-        $msg
-          .html("VIN is not valid! Try 1FTFW1CT5DFC10312")
-          .removeClass("valid")
-          .addClass("not-valid");
+        msg.innerHTML = "VIN is not valid! Try 1FTFW1CT5DFC10312";
+        msg.classList.remove("valid");
+        msg.classList.add("not-valid");
       }
     });
   });
 
   function validateVin(vin) {
     return validate(vin);
+
     function transliterate(c) {
       return "0123456789.ABCDEFGH..JKLMN.P.R..STUVWXYZ".indexOf(c) % 10;
     }
