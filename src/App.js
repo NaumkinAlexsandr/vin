@@ -5,7 +5,9 @@ import { SearchVin } from "./components/SearchVin";
 function App() {
   return (
     <>
-      <SearchVin />
+      <div className="container">
+        <SearchVin />
+      </div>
     </>
   );
 }
